@@ -23,8 +23,7 @@ devsecops-wp-lab/
 ├── .env.example                     # template for local DOCKERHUB_USERNAME + TAG
 ├── docker/
 │   ├── Dockerfile                   # edit this to harden
-│   ├── docker-compose.yml           # hybrid build+image, used locally AND in CI
-│   └── wp-config-placeholder.txt
+│   └── docker-compose.yml           # hybrid build+image, used locally AND in CI
 ├── scans/
 │   └── scan-<short-sha>.txt         # committed automatically by CI
 └── .github/workflows/scan.yml
@@ -65,7 +64,3 @@ Then open http://localhost:8080 in a browser (or `curl.exe -I http://localhost:8
 ```bash
 diff scans/scan-<old-sha>.txt scans/scan-<new-sha>.txt | less
 ```
-
-## ⚠️ Safety
-
-The current image (`wordpress:5.7-apache` baseline) is **deliberately vulnerable**. Run it only on localhost or an isolated network.
