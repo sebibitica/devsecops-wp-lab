@@ -1,0 +1,87 @@
+[i] Updating the Database ...
+[i] Update completed.
+
+[+] URL: http://localhost:8080/ [::1]
+[+] Started: Tue May 19 20:34:57 2026
+
+Interesting Finding(s):
+
+[+] Headers
+ | Interesting Entries:
+ |  - Server: Apache/2.4.67 (Debian)
+ |  - X-Powered-By: PHP/8.3.31
+ | Found By: Headers (Passive Detection)
+ | Confidence: 100%
+
+[+] XML-RPC seems to be enabled: http://localhost:8080/xmlrpc.php
+ | Found By: Direct Access (Aggressive Detection)
+ | Confidence: 100%
+ | References:
+ |  - http://codex.wordpress.org/XML-RPC_Pingback_API
+ |  - https://www.rapid7.com/db/modules/auxiliary/scanner/http/wordpress_ghost_scanner/
+ |  - https://www.rapid7.com/db/modules/auxiliary/dos/http/wordpress_xmlrpc_dos/
+ |  - https://www.rapid7.com/db/modules/auxiliary/scanner/http/wordpress_xmlrpc_login/
+ |  - https://www.rapid7.com/db/modules/auxiliary/scanner/http/wordpress_pingback_access/
+
+[+] WordPress readme found: http://localhost:8080/readme.html
+ | Found By: Direct Access (Aggressive Detection)
+ | Confidence: 100%
+
+[+] The external WP-Cron seems to be enabled: http://localhost:8080/wp-cron.php
+ | Found By: Direct Access (Aggressive Detection)
+ | Confidence: 60%
+ | References:
+ |  - https://www.iplocation.net/defend-wordpress-from-ddos
+ |  - https://github.com/wpscanteam/wpscan/issues/1299
+
+[+] WordPress version 6.9.4 identified (Latest, released on 2026-03-11).
+ | Found By: Rss Generator (Passive Detection)
+ |  - http://localhost:8080/?feed=rss2, <generator>https://wordpress.org/?v=6.9.4</generator>
+ |  - http://localhost:8080/?feed=comments-rss2, <generator>https://wordpress.org/?v=6.9.4</generator>
+
+[+] WordPress theme in use: twentytwentyfive
+ | Location: http://localhost:8080/wp-content/themes/twentytwentyfive/
+ | Latest Version: 1.4 (up to date)
+ | Last Updated: 2025-12-03T00:00:00.000Z
+ | Readme: http://localhost:8080/wp-content/themes/twentytwentyfive/readme.txt
+ | Style URL: http://localhost:8080/wp-content/themes/twentytwentyfive/style.css
+ | Style Name: Twenty Twenty-Five
+ | Style URI: https://wordpress.org/themes/twentytwentyfive/
+ | Description: Twenty Twenty-Five emphasizes simplicity and adaptability. It offers flexible design options, suppor...
+ | Author: the WordPress team
+ | Author URI: https://wordpress.org
+ |
+ | Found By: Urls In Homepage (Passive Detection)
+ | Confirmed By: Urls In 404 Page (Passive Detection)
+ |
+ | Version: 1.4 (80% confidence)
+ | Found By: Style (Passive Detection)
+ |  - http://localhost:8080/wp-content/themes/twentytwentyfive/style.css, Match: 'Version: 1.4'
+
+
+[i] No plugins Found.
+
+
+[i] No themes Found.
+
+
+[i] User(s) Identified:
+
+[+] admin
+ | Found By: Rss Generator (Passive Detection)
+ | Confirmed By:
+ |  Author Id Brute Forcing - Author Pattern (Aggressive Detection)
+ |  Login Error Messages (Aggressive Detection)
+
+[+] WPScan DB API OK
+ | Plan: free
+ | Requests Done (during the scan): 2
+ | Requests Remaining: 19
+
+[+] Finished: Tue May 19 20:35:38 2026
+[+] Requests Done: 1378
+[+] Cached Requests: 11
+[+] Data Sent: 364.657 KB
+[+] Data Received: 65.215 MB
+[+] Memory used: 415.168 MB
+[+] Elapsed time: 00:00:41
