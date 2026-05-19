@@ -1,0 +1,64 @@
+[i] Updating the Database ...
+[i] Update completed.
+
+[+] URL: http://localhost:8080/ [::1]
+[+] Started: Tue May 19 21:19:44 2026
+
+Interesting Finding(s):
+
+[+] Headers
+ | Interesting Entry: Server: Apache
+ | Found By: Headers (Passive Detection)
+ | Confidence: 100%
+
+[+] WordPress version 6.9.4 identified (Latest, released on 2026-03-11).
+ | Found By: Rss Generator (Passive Detection)
+ |  - http://localhost:8080/?feed=rss2, <generator>https://wordpress.org/?v=6.9.4</generator>
+ |  - http://localhost:8080/?feed=comments-rss2, <generator>https://wordpress.org/?v=6.9.4</generator>
+
+[+] WordPress theme in use: twentytwentyfive
+ | Location: http://localhost:8080/wp-content/themes/twentytwentyfive/
+ | Latest Version: 1.4 (up to date)
+ | Last Updated: 2025-12-03T00:00:00.000Z
+ | Readme: http://localhost:8080/wp-content/themes/twentytwentyfive/readme.txt
+ | Style URL: http://localhost:8080/wp-content/themes/twentytwentyfive/style.css
+ | Style Name: Twenty Twenty-Five
+ | Style URI: https://wordpress.org/themes/twentytwentyfive/
+ | Description: Twenty Twenty-Five emphasizes simplicity and adaptability. It offers flexible design options, suppor...
+ | Author: the WordPress team
+ | Author URI: https://wordpress.org
+ |
+ | Found By: Urls In Homepage (Passive Detection)
+ | Confirmed By: Urls In 404 Page (Passive Detection)
+ |
+ | Version: 1.4 (80% confidence)
+ | Found By: Style (Passive Detection)
+ |  - http://localhost:8080/wp-content/themes/twentytwentyfive/style.css, Match: 'Version: 1.4'
+
+
+[i] No plugins Found.
+
+
+[i] No themes Found.
+
+
+[i] User(s) Identified:
+
+[+] admin
+ | Found By: Rss Generator (Passive Detection)
+ | Confirmed By:
+ |  Author Id Brute Forcing - Author Pattern (Aggressive Detection)
+ |  Login Error Messages (Aggressive Detection)
+
+[+] WPScan DB API OK
+ | Plan: free
+ | Requests Done (during the scan): 2
+ | Requests Remaining: 13
+
+[+] Finished: Tue May 19 21:20:17 2026
+[+] Requests Done: 1380
+[+] Cached Requests: 11
+[+] Data Sent: 365.064 KB
+[+] Data Received: 65.154 MB
+[+] Memory used: 415.125 MB
+[+] Elapsed time: 00:00:33
