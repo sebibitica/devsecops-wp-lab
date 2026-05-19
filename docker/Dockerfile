@@ -1,11 +1,11 @@
-# VULNERABLE
+# Hardening step 1: bump WordPress base image
+#
+# Previous baseline: wordpress:5.7-apache (2021, 43+ known core CVEs)
+# This change: wordpress:latest — current stable WP, current Apache, current PHP.
+# Expected effect on scan: the WP-core vulnerability list should drop to ~zero,
 
-# This Dockerfile is intentionally weak. WPScan should find plenty here.
+FROM wordpress:latest
 
-# OLD WordPress release with known CVEs. WP 5.7 is from 2021 and
-# has multiple disclosed vulnerabilities WPScan will report.
-FROM wordpress:5.7-apache
-
-LABEL stage="vulnerable-baseline"
+LABEL stage="hardening-step-1-base-bump"
 
 EXPOSE 80
