@@ -1,0 +1,132 @@
+name: WordPress WPScan – build, scan, push
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+env:
+  COMPOSE_FILE: docker/docker-compose.yml
+  IMAGE_NAME: devsecops-wp-lab
+  DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+
+jobs:
+  build-scan-push:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build and start stack
+        run: docker compose -f $COMPOSE_FILE up -d --build
+
+      - name: Wait for WordPress
+        run: |
+          for i in {1..40}; do
+            code=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8080/ || echo "000")
+            if [ "$code" = "200" ] || [ "$code" = "302" ]; then
+              echo "WordPress responding (HTTP $code)"
+              exit 0
+            fi
+            echo "Waiting... attempt $i (got $code)"
+            sleep 5
+          done
+          docker compose -f $COMPOSE_FILE logs
+          exit 1
+
+      - name: Complete WordPress installation (via wp-cli)
+        # Without this, WPScan bails out with "Website is in install mode".
+        run: |
+          docker run --rm \
+            --network devsecops-wp-lab_wp-net \
+            --volumes-from wp-site \
+            -e WORDPRESS_DB_HOST=wp-db:3306 \
+            -e WORDPRESS_DB_USER=wpuser \
+            -e WORDPRESS_DB_PASSWORD=wppass \
+            -e WORDPRESS_DB_NAME=wordpress \
+            wordpress:cli \
+            wp core install \
+              --url=http://localhost:8080 \
+              --title="DevSecOps Lab" \
+              --admin_user=admin \
+              --admin_password=admin123 \
+              --admin_email=admin@example.com \
+              --skip-email
+
+      - name: Install WPScan
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ruby-full build-essential libcurl4-openssl-dev zlib1g-dev
+          sudo gem install wpscan --no-document
+
+      - name: Run WPScan
+        env:
+          WPSCAN_API_TOKEN: ${{ secrets.WPSCAN_API_TOKEN }}
+        run: |
+          mkdir -p scans
+          OUT="scans/scan-${GITHUB_SHA:0:7}.txt"
+          API=""
+          [ -n "$WPSCAN_API_TOKEN" ] && API="--api-token $WPSCAN_API_TOKEN"
+          wpscan \
+            --url http://localhost:8080 \
+            --enumerate u,vp,vt \
+            --no-banner \
+            --force \
+            --format cli-no-color \
+            --output "$OUT" \
+            $API \
+          || true
+          echo "--- Last 60 lines of scan ---"
+          tail -n 60 "$OUT" || true
+
+      - name: Upload scan artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: wpscan-${{ github.sha }}
+          path: scans/scan-*.txt
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Tag and push
+        run: |
+          SHA=${GITHUB_SHA:0:7}
+          DH="${DOCKERHUB_USERNAME}/${IMAGE_NAME}"
+          GH="ghcr.io/${{ github.repository_owner }}/${IMAGE_NAME}"
+          # compose built $DH:latest — add the immutable sha tag and GHCR variants
+          docker tag $DH:latest $DH:sha-$SHA
+          docker tag $DH:latest $GH:latest
+          docker tag $DH:latest $GH:sha-$SHA
+          docker push $DH:latest
+          docker push $DH:sha-$SHA
+          docker push $GH:latest
+          docker push $GH:sha-$SHA
+
+      - name: Commit scan to /scans/
+        if: github.event_name == 'push'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add scans/
+          if ! git diff --cached --quiet; then
+            git commit -m "ci: scan output for ${GITHUB_SHA:0:7} [skip ci]"
+            git push
+          fi
+
+      - name: Tear down
+        if: always()
+        run: docker compose -f $COMPOSE_FILE down -v

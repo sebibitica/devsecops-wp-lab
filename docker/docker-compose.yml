@@ -1,0 +1,40 @@
+name: devsecops-wp-lab
+
+services:
+  wp-db:
+    image: mysql:5.7
+    container_name: wp-db
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpass
+      MYSQL_DATABASE: wordpress
+      MYSQL_USER: wpuser
+      MYSQL_PASSWORD: wppass
+    networks:
+      - wp-net
+
+  wp-site:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    image: ${DOCKERHUB_USERNAME:?set DOCKERHUB_USERNAME in .env}/devsecops-wp-lab:${TAG:-latest}
+    container_name: wp-site
+    depends_on:
+      - wp-db
+    ports:
+      - "8080:80"
+    environment:
+      WORDPRESS_DB_HOST: wp-db:3306
+      WORDPRESS_DB_USER: wpuser
+      WORDPRESS_DB_PASSWORD: wppass
+      WORDPRESS_DB_NAME: wordpress
+    volumes:
+      - wp_html:/var/www/html
+    networks:
+      - wp-net
+
+volumes:
+  wp_html:
+
+networks:
+  wp-net:
+    driver: bridge
